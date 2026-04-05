@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Beddhu Mio</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230F0E0C'/%3E%3Crect x='0' y='0' width='512' height='6' fill='%23009246'/%3E%3Crect x='0' y='506' width='512' height='6' fill='%23CE2B37'/%3E%3Ctext x='256' y='300' font-family='Georgia,serif' font-size='210' font-weight='700' fill='%237EBF94' text-anchor='middle'%3EBM%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/json,%7B%22name%22%3A%22Beddhu%20Mio%22%2C%22short_name%22%3A%22Beddhu%20Mio%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230F0E0C%22%2C%22theme_color%22%3A%22%233D7A52%22%7D">
+<meta name="theme-color" content="#0F0E0C" id="theme-meta">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg: #0F0E0C; --surface: #1A1916; --surface2: #242220;
+  --ink: #F0EDE6; --ink2: #9A9180; --ink3: #5C5548;
+  --border: rgba(240,237,230,0.08); --border2: rgba(240,237,230,0.15);
+  --green: #3D7A52; --green-light: rgba(61,122,82,0.15); --green-text: #7EBF94;
+  --amber: #B87333; --amber-light: rgba(184,115,51,0.12); --amber-text: #D4956A;
+  --red: #C0392B; --red-light: rgba(192,57,43,0.15);
+  --serif: 'Lora', Georgia, serif; --sans: 'Outfit', system-ui, sans-serif;
+}
+.light {
+  --bg: #F5F2EB; --surface: #FDFCF8; --surface2: #F0EDE4;
+  --ink: #1C1A15; --ink2: #6B6455; --ink3: #A89F8C;
+  --border: rgba(28,26,21,0.08); --border2: rgba(28,26,21,0.18);
+  --green-light: rgba(61,122,82,0.1); --green-text: #2D5A3D;
+  --amber-light: rgba(184,115,51,0.1); --amber-text: #8B4F1A;
+  --red-light: rgba(192,57,43,0.1);
+}
+html,body { height:100%; }
+body { font-family:var(--sans); background:var(--bg); color:var(--ink); min-height:100dvh; display:flex; flex-direction:column; align-items:center; transition: background 0.3s, color 0.3s; }
+
+/* NAV TABS */
+.nav { width:100%; max-width:520px; display:flex; border-bottom:1px solid var(--border); background:var(--bg); position:sticky; top:0; z-index:10; }
+.nav-tab { flex:1; padding:14px 8px 12px; font-size:12px; font-weight:500; font-family:var(--sans); background:transparent; border:none; color:var(--ink3); cursor:pointer; border-bottom:2px solid transparent; transition:color 0.15s,border-color 0.15s; letter-spacing:0.03em; }
+.nav-tab.on { color:var(--green-text); border-bottom-color:var(--green); }
+
+/* TOPBAR */
+.topbar { width:100%; max-width:520px; padding:14px 20px 0; display:flex; align-items:center; justify-content:space-between; }
+.brand h1 { font-family:var(--serif); font-size:24px; font-weight:600; color:var(--ink); line-height:1; letter-spacing:-0.01em; }
+.brand h1 em { font-style:italic; color:var(--green-text); }
+.brand p { font-size:10px; color:var(--ink3); letter-spacing:0.1em; text-transform:uppercase; margin-top:2px; }
+.topbar-right { display:flex; gap:8px; }
+.icon-btn { width:38px; height:38px; border-radius:50%; background:var(--surface); border:1px solid var(--border2); cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--ink2); transition:background 0.2s,color 0.2s; flex-shrink:0; }
+.icon-btn:hover,.icon-btn.on { background:var(--surface2); color:var(--ink); }
+.icon-btn svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+/* SETTINGS DRAWER */
+.drawer { width:100%; max-width:520px; background:var(--surface); border:1px solid var(--border); border-radius:20px; margin:10px 20px 0; padding:18px; display:none; flex-direction:column; gap:12px; }
+.drawer.open { display:flex; animation:slideDown 0.2s ease both; }
+@keyframes slideDown { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+.s-label { font-size:10px; font-weight:500; color:var(--ink3); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:4px; }
+.s-input { width:100%; padding:11px 14px; font-size:14px; font-family:var(--sans); background:var(--bg); border:1px solid var(--border2); border-radius:12px; color:var(--ink); }
+.s-input:focus { outline:none; border-color:var(--green); }
+.s-input::placeholder { color:var(--ink3); }
+.s-hint { font-size:11px; color:var(--ink3); line-height:1.5; margin-top:2px; }
+.s-row { display:flex; gap:8px; align-items:center; }
+.s-save { padding:10px 18px; font-size:14px; font-weight:500; font-family:var(--sans); background:var(--green); color:#fff; border:none; border-radius:12px; cursor:pointer; }
+
+/* PAGES */
+.page { display:none; width:100%; max-width:520px; padding:14px 20px 100px; flex-direction:column; gap:12px; }
+.page.on { display:flex; }
+
+/* CONTROLS */
+.controls { display:flex; gap:8px; }
+.pill-group { display:flex; background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; flex:1; }
+.pill-group button { flex:1; padding:10px 4px; font-size:12px; font-weight:400; font-family:var(--sans); background:transparent; border:none; color:var(--ink2); cursor:pointer; transition:background 0.15s,color 0.15s; white-space:nowrap; }
+.pill-group button:not(:last-child) { border-right:1px solid var(--border); }
+.pill-group button.on { background:var(--surface2); color:var(--ink); font-weight:500; }
+
+/* EDITOR */
+.editor-wrap { position:relative; }
+textarea { width:100%; min-height:130px; padding:16px 16px 50px; font-size:16px; line-height:1.65; font-family:var(--sans); background:var(--surface); border:1px solid var(--border); border-radius:20px; color:var(--ink); resize:none; transition:border-color 0.2s; -webkit-appearance:none; }
+textarea:focus { outline:none; border-color:var(--green); }
+textarea::placeholder { color:var(--ink3); }
+.editor-foot { position:absolute; bottom:10px; left:12px; right:12px; display:flex; align-items:center; justify-content:space-between; }
+.char-hint { font-size:11px; color:var(--ink3); }
+.mic-wrap { display:flex; align-items:center; gap:7px; }
+.mic-lbl { font-size:11px; color:var(--red); font-weight:500; display:none; }
+.mic-lang { font-size:12px; padding:5px 8px; border:1px solid var(--border2); border-radius:8px; background:var(--surface2); color:var(--ink2); font-family:var(--sans); cursor:pointer; }
+.mic-btn { width:34px; height:34px; border-radius:50%; background:var(--surface2); border:1px solid var(--border2); cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--ink2); transition:all 0.2s; flex-shrink:0; }
+.mic-btn svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; }
+.mic-btn.recording { background:var(--red-light); border-color:var(--red); color:var(--red); animation:pulse 1.2s ease infinite; }
+.mic-btn.processing { background:var(--green-light); border-color:var(--green); color:var(--green-text); }
+@keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,0.3)} 50%{box-shadow:0 0 0 7px rgba(192,57,43,0)} }
+
+/* GO BTN */
+.go-btn { width:100%; padding:17px; font-size:17px; font-weight:600; font-family:var(--sans); background:var(--green); color:#fff; border:none; border-radius:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; transition:opacity 0.15s,transform 0.1s; -webkit-appearance:none; }
+.go-btn:active { transform:scale(0.98); }
+.go-btn:disabled { opacity:0.35; cursor:not-allowed; }
+.go-sp { width:18px; height:18px; border:2.5px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; display:none; }
+@keyframes spin { to{transform:rotate(360deg)} }
+
+/* RESULT CARDS */
+.results { display:flex; flex-direction:column; gap:10px; }
+.rc { background:var(--green-light); border:1px solid rgba(61,122,82,0.25); border-radius:20px; padding:16px; animation:fadeUp 0.3s ease both; }
+.rc.formale { background:var(--amber-light); border-color:rgba(184,115,51,0.25); }
+.rc-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.rc-label { font-size:10px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--green-text); }
+.rc.formale .rc-label { color:var(--amber-text); }
+.rc-copied-badge { font-size:10px; font-weight:500; color:var(--green-text); opacity:0; transition:opacity 0.3s; padding:3px 8px; background:var(--green-light); border-radius:99px; }
+.rc-copied-badge.show { opacity:1; }
+.rc-text { font-family:var(--serif); font-size:18px; font-weight:600; color:var(--ink); line-height:1.6; margin-bottom:14px; }
+.rc-actions { display:flex; gap:7px; align-items:center; flex-wrap:wrap; }
+.rc-act { padding:8px 13px; font-size:12px; font-family:var(--sans); background:rgba(240,237,230,0.06); border:1px solid var(--border2); border-radius:10px; color:var(--ink2); cursor:pointer; display:inline-flex; align-items:center; gap:5px; transition:background 0.15s,color 0.15s; -webkit-appearance:none; }
+.light .rc-act { background:rgba(28,26,21,0.04); }
+.rc-act:hover { color:var(--ink); }
+.rc-act:disabled { opacity:0.4; cursor:not-allowed; }
+.mini-spin { width:10px; height:10px; border:1.5px solid var(--border2); border-top-color:var(--ink2); border-radius:50%; animation:spin 0.7s linear infinite; display:none; }
+.copy-big { margin-left:auto; padding:8px 16px; font-size:13px; font-weight:500; font-family:var(--sans); background:var(--ink); color:var(--bg); border:none; border-radius:10px; cursor:pointer; transition:opacity 0.15s; -webkit-appearance:none; }
+.copy-big:hover { opacity:0.85; }
+
+/* FEEDBACK THUMBS */
+.rc-feedback { display:flex; gap:6px; margin-left:4px; }
+.thumb-btn { width:28px; height:28px; border-radius:8px; border:1px solid var(--border2); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:13px; transition:background 0.15s; }
+.thumb-btn:hover { background:var(--surface2); }
+.thumb-btn.active-up { background:var(--green-light); border-color:var(--green); }
+.thumb-btn.active-down { background:var(--red-light); border-color:var(--red); }
+
+/* EXPLANATION */
+.rc-expl { margin-top:10px; padding:10px 12px; background:var(--surface); border-radius:12px; font-size:13px; color:var(--ink2); line-height:1.6; display:none; animation:fadeUp 0.2s ease both; }
+.rc-expl.show { display:block; }
+
+/* ERR */
+.err-box { background:var(--red-light); border:1px solid rgba(192,57,43,0.3); border-radius:16px; padding:14px 16px; font-size:14px; color:#E57373; }
+
+/* HISTORY PAGE */
+.hist-empty { text-align:center; padding:40px 20px; color:var(--ink3); font-size:14px; }
+.hist-item { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:14px 16px; display:flex; flex-direction:column; gap:8px; animation:fadeUp 0.2s ease both; }
+.hist-orig { font-size:12px; color:var(--ink3); }
+.hist-result { font-family:var(--serif); font-size:15px; font-weight:600; color:var(--ink); line-height:1.5; }
+.hist-meta { display:flex; align-items:center; justify-content:space-between; }
+.hist-time { font-size:11px; color:var(--ink3); }
+.hist-actions { display:flex; gap:6px; }
+.hist-btn { padding:5px 12px; font-size:12px; font-family:var(--sans); background:var(--surface2); border:1px solid var(--border2); border-radius:8px; color:var(--ink2); cursor:pointer; }
+.hist-clear { padding:8px 14px; font-size:12px; font-family:var(--sans); background:var(--red-light); border:1px solid rgba(192,57,43,0.3); border-radius:10px; color:#E57373; cursor:pointer; align-self:flex-end; }
+
+/* FAV PAGE */
+.fav-empty { text-align:center; padding:40px 20px; color:var(--ink3); font-size:14px; }
+.fav-item { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:14px 16px; display:flex; flex-direction:column; gap:8px; animation:fadeUp 0.2s ease both; }
+.fav-label { font-size:10px; color:var(--ink3); font-weight:500; text-transform:uppercase; letter-spacing:0.07em; }
+.fav-text { font-family:var(--serif); font-size:16px; font-weight:600; color:var(--ink); line-height:1.5; }
+.fav-actions { display:flex; gap:6px; align-items:center; }
+.fav-del { margin-left:auto; padding:5px 10px; font-size:12px; font-family:var(--sans); background:transparent; border:1px solid var(--border2); border-radius:8px; color:var(--ink3); cursor:pointer; }
+
+/* TOAST */
+.toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); background:var(--green); color:#fff; padding:10px 20px; border-radius:99px; font-size:13px; font-weight:500; font-family:var(--sans); z-index:999; pointer-events:none; animation:fadeUp 0.2s ease both; }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="nav">
+  <button class="nav-tab on" onclick="showPage('translate',this)">Traduci</button>
+  <button class="nav-tab" onclick="showPage('history',this)">Cronologia</button>
+  <button class="nav-tab" onclick="showPage('favourites',this)">Preferiti</button>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="brand">
+    <h1>Beddhu <em>Mio</em></h1>
+    <p>IT · EN · FR</p>
+  </div>
+  <div class="topbar-right">
+    <button class="icon-btn" id="theme-btn" title="Tema">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <button class="icon-btn" id="gear-btn" title="Impostazioni">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- SETTINGS DRAWER -->
+<div class="drawer" id="settings-drawer">
+  <div>
+    <div class="s-label">Anthropic API key</div>
+    <input type="password" class="s-input" id="api-key" placeholder="sk-ant-…"/>
+  </div>
+  <div>
+    <div class="s-label">OpenAI API key <span style="font-weight:300;text-transform:none;letter-spacing:0;color:var(--ink3);">— opzionale (Whisper)</span></div>
+    <input type="password" class="s-input" id="oai-key" placeholder="sk-… oppure lascia vuoto"/>
+    <div class="s-hint">Senza: mic browser (scegli lingua). Con: Whisper auto-detect IT/EN/FR.</div>
+  </div>
+  <div class="s-row">
+    <button class="s-save" onclick="saveKeys()">Salva</button>
+  </div>
+</div>
+
+<!-- TRANSLATE PAGE -->
+<div class="page on" id="page-translate">
+  <div class="controls">
+    <div class="pill-group" id="tone-seg">
+      <button class="on" data-v="auto">Auto</button>
+      <button data-v="informale">Inform.</button>
+      <button data-v="formale">Formale</button>
+    </div>
+    <div class="pill-group" id="ctx-seg" style="flex:0.7;">
+      <button class="on" data-v="fresh">Nuovo</button>
+      <button data-v="linked">↺ Ctx</button>
+    </div>
+  </div>
+
+  <div class="editor-wrap">
+    <textarea id="txt" placeholder="Scrivi, parla, incolla…" rows="5"></textarea>
+    <div class="editor-foot">
+      <span class="char-hint" id="char-hint"></span>
+      <div class="mic-wrap">
+        <span class="mic-lbl" id="mic-lbl">In ascolto…</span>
+        <select id="mic-lang" class="mic-lang">
+          <option value="it-IT">🇮🇹 IT</option>
+          <option value="en-GB">🇬🇧 EN</option>
+          <option value="fr-FR">🇫🇷 FR</option>
+        </select>
+        <button class="mic-btn" id="mic-btn">
+          <svg id="mic-icon" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <button class="go-btn" id="go-btn">
+    <div class="go-sp" id="go-sp"></div>
+    <span id="go-lbl">Traduci / Correggi</span>
+  </button>
+
+  <div class="results" id="results"></div>
+</div>
+
+<!-- HISTORY PAGE -->
+<div class="page" id="page-history">
+  <div id="hist-list"></div>
+</div>
+
+<!-- FAVOURITES PAGE -->
+<div class="page" id="page-favourites">
+  <div id="fav-list"></div>
+</div>
+
+<script>
+// ---- STATE ----
+var tone = 'auto', ctx = 'fresh', convHistory = [];
+var isLight = localStorage.getItem('bm_theme') === 'light';
+var explMode = false;
+
+// ---- THEME ----
+function applyTheme() {
+  document.body.classList.toggle('light', isLight);
+  document.getElementById('theme-meta').content = isLight ? '#F5F2EB' : '#0F0E0C';
+}
+applyTheme();
+document.getElementById('theme-btn').onclick = function() {
+  isLight = !isLight;
+  localStorage.setItem('bm_theme', isLight ? 'light' : 'dark');
+  applyTheme();
+};
+
+// ---- KEYS ----
+var sAnt = localStorage.getItem('ant_key');
+var sOai = localStorage.getItem('oai_key');
+if (sAnt) document.getElementById('api-key').value = sAnt;
+if (sOai) document.getElementById('oai-key').value = sOai;
+
+document.getElementById('gear-btn').onclick = function() {
+  var d = document.getElementById('settings-drawer');
+  var open = d.classList.toggle('open');
+  document.getElementById('gear-btn').classList.toggle('on', open);
+};
+
+function saveKeys() {
+  var a = document.getElementById('api-key').value.trim();
+  var o = document.getElementById('oai-key').value.trim();
+  if (a) localStorage.setItem('ant_key', a);
+  if (o) localStorage.setItem('oai_key', o);
+  document.getElementById('settings-drawer').classList.remove('open');
+  document.getElementById('gear-btn').classList.remove('on');
+  updateMicUI();
+  toast('Salvato!');
+}
+
+// ---- NAVIGATION ----
+function showPage(name, tab) {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('on'); });
+  document.querySelectorAll('.nav-tab').forEach(function(t) { t.classList.remove('on'); });
+  document.getElementById('page-' + name).classList.add('on');
+  tab.classList.add('on');
+  if (name === 'history') renderHistory();
+  if (name === 'favourites') renderFavourites();
+}
+
+// ---- SEGMENTS ----
+function bindSeg(id, setter) {
+  document.getElementById(id).querySelectorAll('button').forEach(function(b) {
+    b.onclick = function() {
+      document.getElementById(id).querySelectorAll('button').forEach(function(x) { x.classList.remove('on'); });
+      b.classList.add('on'); setter(b.dataset.v);
+    };
+  });
+}
+bindSeg('tone-seg', function(v) { tone = v; });
+bindSeg('ctx-seg', function(v) { ctx = v; if (v === 'fresh') { convHistory = []; } });
+
+// ---- UTILS ----
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function toast(msg) {
+  var t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function() { t.remove(); }, 2000);
+}
+
+function copyText(text, btn, label) {
+  function ok() {
+    if (btn) { var orig = btn.textContent; btn.textContent = '✓ Copiato'; setTimeout(function() { btn.textContent = orig; }, 1500); }
+    if (label) { label.classList.add('show'); setTimeout(function() { label.classList.remove('show'); }, 2000); }
+  }
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(ok).catch(fb);
+  } else { fb(); }
+  function fb() {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0;';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    try { document.execCommand('copy'); ok(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+}
+
+// char count
+document.getElementById('txt').addEventListener('input', function() {
+  var n = this.value.length;
+  document.getElementById('char-hint').textContent = n > 0 ? n + ' car.' : '';
+});
+
+// ---- HISTORY ----
+function getHistory() { try { return JSON.parse(localStorage.getItem('bm_history') || '[]'); } catch(e) { return []; } }
+function saveHistory(h) { localStorage.setItem('bm_history', JSON.stringify(h.slice(0,100))); }
+
+function addToHistory(orig, results) {
+  var h = getHistory();
+  h.unshift({ id: Date.now(), orig: orig, results: results, ts: new Date().toISOString() });
+  saveHistory(h);
+}
+
+function renderHistory() {
+  var h = getHistory();
+  var el = document.getElementById('hist-list');
+  if (!h.length) { el.innerHTML = '<div class="hist-empty">Nessuna traduzione ancora.<br>Le tue traduzioni appariranno qui.</div>'; return; }
+  var html = '<button class="hist-clear" onclick="clearHistory()">Cancella tutto</button>';
+  h.forEach(function(item) {
+    var first = item.results[0] || {};
+    html += '<div class="hist-item">'
+      + '<div class="hist-orig">' + esc(item.orig.substring(0,80)) + (item.orig.length > 80 ? '…' : '') + '</div>'
+      + '<div class="hist-result">' + esc((first.text||'').substring(0,120)) + '</div>'
+      + '<div class="hist-meta">'
+      + '<span class="hist-time">' + new Date(item.ts).toLocaleString('it-IT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) + '</span>'
+      + '<div class="hist-actions">'
+      + '<button class="hist-btn" onclick="reuseHistItem(' + item.id + ')">Riusa</button>'
+      + '<button class="hist-btn" onclick="copyText(\'' + esc(first.text||'').replace(/'/g,"\\'") + '\',this,null)">Copia</button>'
+      + '</div></div></div>';
+  });
+  el.innerHTML = html;
+}
+
+function clearHistory() {
+  if (confirm('Cancellare tutta la cronologia?')) { localStorage.removeItem('bm_history'); renderHistory(); }
+}
+
+function reuseHistItem(id) {
+  var h = getHistory();
+  var item = h.find(function(x) { return x.id === id; });
+  if (item) {
+    document.getElementById('txt').value = item.orig;
+    showPage('translate', document.querySelector('.nav-tab'));
+    document.querySelectorAll('.nav-tab')[0].classList.add('on');
+    document.querySelectorAll('.nav-tab')[1].classList.remove('on');
+    document.querySelectorAll('.nav-tab')[2].classList.remove('on');
+  }
+}
+
+// ---- FAVOURITES ----
+function getFavs() { try { return JSON.parse(localStorage.getItem('bm_favs') || '[]'); } catch(e) { return []; } }
+function saveFavs(f) { localStorage.setItem('bm_favs', JSON.stringify(f)); }
+
+function addFav(text, label) {
+  var f = getFavs();
+  if (f.find(function(x) { return x.text === text; })) { toast('Già nei preferiti!'); return; }
+  f.unshift({ id: Date.now(), text: text, label: label });
+  saveFavs(f); toast('Aggiunto ai preferiti ⭐');
+}
+
+function renderFavourites() {
+  var f = getFavs();
+  var el = document.getElementById('fav-list');
+  if (!f.length) { el.innerHTML = '<div class="fav-empty">Nessun preferito ancora.<br>Tocca ⭐ su una traduzione per salvarla.</div>'; return; }
+  var html = '';
+  f.forEach(function(item) {
+    html += '<div class="fav-item">'
+      + '<div class="fav-label">' + esc(item.label||'Italiano') + '</div>'
+      + '<div class="fav-text">' + esc(item.text) + '</div>'
+      + '<div class="fav-actions">'
+      + '<button class="hist-btn" onclick="copyText(\'' + item.text.replace(/\\/g,'\\\\').replace(/'/g,"\\'") + '\',this,null)">Copia</button>'
+      + '<button class="fav-del" onclick="delFav(' + item.id + ')">Rimuovi</button>'
+      + '</div></div>';
+  });
+  el.innerHTML = html;
+}
+
+function delFav(id) {
+  var f = getFavs().filter(function(x) { return x.id !== id; });
+  saveFavs(f); renderFavourites();
+}
+
+// ---- TRANSFORM ----
+async function transformText(uid, mode, btn) {
+  var apiKey = document.getElementById('api-key').value.trim();
+  if (!apiKey) { alert('Configura prima la tua API key.'); return; }
+  var el = document.getElementById(uid);
+  var orig = el.textContent.trim();
+  if (!orig) return;
+  var sp = btn.querySelector('.mini-spin');
+  btn.disabled = true; sp.style.display = 'inline-block';
+  var prompt = mode === 'rephrase'
+    ? 'Rephrase this Italian text differently, same meaning and register. Output ONLY the Italian text:\n\n' + orig
+    : 'Shorten this Italian text, keep the core meaning. Output ONLY the Italian text:\n\n' + orig;
+  try {
+    var r = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,messages:[{role:'user',content:prompt}]})
+    });
+    var d = await r.json();
+    if (d.error) throw new Error(d.error.message);
+    var res = (d.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('').trim();
+    if (res) { el.textContent = res; el.style.animation='none'; el.offsetHeight; el.style.animation='fadeUp 0.3s ease both'; }
+  } catch(e) { alert('Errore: '+(e.message||e)); }
+  finally { btn.disabled=false; sp.style.display='none'; }
+}
+
+// ---- EXPLANATION ----
+async function showExplanation(uid, btn) {
+  var el = document.getElementById(uid);
+  var explEl = document.getElementById('expl-' + uid);
+  if (explEl.classList.contains('show')) { explEl.classList.remove('show'); btn.textContent = 'Perché?'; return; }
+  var orig = el.textContent.trim();
+  btn.textContent = '…'; btn.disabled = true;
+  try {
+    var apiKey = document.getElementById('api-key').value.trim();
+    var r = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,messages:[{role:'user',content:'In 2-3 short sentences in Italian, explain WHY this phrasing is natural and correct for a native Italian speaker. Text: "'+orig+'"'}]})
+    });
+    var d = await r.json();
+    var res = (d.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('').trim();
+    explEl.textContent = res;
+    explEl.classList.add('show');
+    btn.textContent = 'Chiudi';
+  } catch(e) { btn.textContent = 'Perché?'; }
+  finally { btn.disabled = false; }
+}
+
+// ---- FEEDBACK ----
+function handleThumb(uid, val, upBtn, downBtn) {
+  var isUp = val === 'up';
+  upBtn.classList.toggle('active-up', isUp);
+  downBtn.classList.toggle('active-down', !isUp);
+  if (!isUp) {
+    toast('Riprovo con stile diverso…');
+    setTimeout(function() {
+      var el = document.getElementById(uid);
+      var retryBtn = document.querySelector('[data-retry="'+uid+'"]');
+      if (retryBtn) retryBtn.click();
+    }, 600);
+  } else {
+    toast('Ottimo!');
+  }
+}
+
+// ---- MAIN TRANSLATE ----
+document.getElementById('txt').addEventListener('keydown', function(e) {
+  if ((e.metaKey||e.ctrlKey) && e.key==='Enter') document.getElementById('go-btn').click();
+});
+
+document.getElementById('go-btn').onclick = async function() {
+  var apiKey = document.getElementById('api-key').value.trim();
+  if (!apiKey) {
+    document.getElementById('settings-drawer').classList.add('open');
+    document.getElementById('gear-btn').classList.add('on');
+    document.getElementById('api-key').focus();
+    return;
+  }
+  var text = document.getElementById('txt').value.trim();
+  if (!text) return;
+
+  var btn = document.getElementById('go-btn');
+  var sp = document.getElementById('go-sp');
+  var lbl = document.getElementById('go-lbl');
+  var out = document.getElementById('results');
+
+  btn.disabled=true; sp.style.display='block'; lbl.textContent='…'; out.innerHTML='';
+
+  var toneInstr = tone==='auto'
+    ? 'If unclear, provide TWO results: "Informale (Tu)" and "Formale (Lei)".'
+    : tone==='informale' ? 'ONE result labeled "Informale". Informal register (Tu).'
+    : 'ONE result labeled "Formale". Formal register (Lei).';
+
+  var sys = 'You are a specialized Italian language assistant.\n- Italian input: correct to sound like a native speaker.\n- English/French input: translate into natural standard Italian.\n- Use "Italiano Vero" — how Italians actually speak today.\n- '+toneInstr+'\n- Be concise. Output only Italian text.\n\nRespond ONLY with valid JSON:\n{"context_used":false,"results":[{"label":"Informale (Tu)","text":"..."}]}';
+
+  var userMsg = {role:'user',content:text};
+  var msgs = (ctx==='linked' && convHistory.length>0) ? convHistory.concat([userMsg]) : [userMsg];
+
+  try {
+    var r = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:msgs})
+    });
+    var d = await r.json();
+    if (d.error) throw new Error(d.error.message);
+    var raw = (d.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');
+    var parsed = JSON.parse(raw.replace(/```json|```/gi,'').trim());
+
+    if (ctx==='linked') {
+      convHistory.push(userMsg);
+      convHistory.push({role:'assistant',content:raw});
+      if (convHistory.length>12) convHistory=convHistory.slice(-12);
+    }
+
+    // save to history
+    addToHistory(text, parsed.results||[]);
+
+    // auto-copy informale
+    var informaleResult = (parsed.results||[]).find(function(res) {
+      return !res.label || res.label.toLowerCase().indexOf('formale')===-1 || res.label.toLowerCase().indexOf('informale')!==-1;
+    }) || (parsed.results||[])[0];
+    if (informaleResult) {
+      copyText(informaleResult.text, null, null);
+    }
+
+    var html = '';
+    (parsed.results||[]).forEach(function(res, i) {
+      var isF = res.label && res.label.toLowerCase().indexOf('formale')!==-1 && res.label.toLowerCase().indexOf('informale')===-1;
+      var uid = 'rt'+Date.now()+i;
+      var isInformale = !isF;
+      html += '<div class="rc'+(isF?' formale':'')+'">'
+        +'<div class="rc-top">'
+        +'<div class="rc-label">'+esc(res.label)+(isInformale ? ' · auto-copiato' : '')+'</div>'
+        +'<div class="rc-copied-badge'+(isInformale?' show':'')+'" id="badge-'+uid+'">Copiato!</div>'
+        +'</div>'
+        +'<div class="rc-text" id="'+uid+'">'+esc(res.text)+'</div>'
+        +'<div class="rc-actions">'
+        +'<button class="rc-act" onclick="transformText(\''+uid+'\',\'rephrase\',this)" data-retry="'+uid+'"><div class="mini-spin"></div>↺ Riformula</button>'
+        +'<button class="rc-act" onclick="transformText(\''+uid+'\',\'shorten\',this)"><div class="mini-spin"></div>✂ Accorcia</button>'
+        +'<button class="rc-act" onclick="showExplanation(\''+uid+'\',this)">Perché?</button>'
+        +'<div class="rc-feedback">'
+        +'<button class="thumb-btn" id="up-'+uid+'" onclick="handleThumb(\''+uid+'\',\'up\',this,document.getElementById(\'down-'+uid+'\'))">👍</button>'
+        +'<button class="thumb-btn" id="down-'+uid+'" onclick="handleThumb(\''+uid+'\',\'down\',document.getElementById(\'up-'+uid+'\'),this)">👎</button>'
+        +'</div>'
+        +'<button class="rc-act" onclick="addFav(document.getElementById(\''+uid+'\').textContent,\''+esc(res.label)+'\')">⭐</button>'
+        +'<button class="copy-big" onclick="copyText(document.getElementById(\''+uid+'\').textContent,this,null)">Copia</button>'
+        +'</div>'
+        +'<div class="rc-expl" id="expl-'+uid+'"></div>'
+        +'</div>';
+    });
+    out.innerHTML = html;
+
+    // fade badge after 2.5s
+    setTimeout(function() {
+      document.querySelectorAll('.rc-copied-badge.show').forEach(function(b) { b.classList.remove('show'); });
+    }, 2500);
+
+    document.getElementById('txt').value='';
+    document.getElementById('char-hint').textContent='';
+
+  } catch(e) {
+    out.innerHTML='<div class="err-box">Errore: '+esc(e.message||String(e))+'</div>';
+  } finally {
+    btn.disabled=false; sp.style.display='none'; lbl.textContent='Traduci / Correggi';
+  }
+};
+
+// ---- MIC ----
+var micBtn=document.getElementById('mic-btn');
+var micIcon=document.getElementById('mic-icon');
+var micLbl=document.getElementById('mic-lbl');
+var micLangSel=document.getElementById('mic-lang');
+var mediaRecorder=null,audioChunks=[],isRecording=false;
+var recognition=null,isListening=false;
+var SVG_MIC='<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/>';
+var SVG_STOP='<rect x="6" y="6" width="12" height="12" rx="3" fill="currentColor" stroke="none"/>';
+var SVG_PROC='<circle cx="12" cy="12" r="7" stroke-dasharray="22 10" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.8s" repeatCount="indefinite"/></circle>';
+
+function hasOai(){return !!document.getElementById('oai-key').value.trim();}
+function hasSR(){return ('webkitSpeechRecognition' in window)||('SpeechRecognition' in window);}
+
+function updateMicUI(){
+  micLangSel.style.display=hasOai()?'none':(hasSR()?'inline-block':'none');
+  micBtn.disabled=!hasOai()&&!hasSR();
+}
+document.getElementById('oai-key').addEventListener('input',updateMicUI);
+updateMicUI();
+
+function setMicState(s){
+  micBtn.classList.remove('recording','processing');
+  micLbl.style.display='none';
+  if(s==='idle'){micIcon.innerHTML=SVG_MIC;micBtn.disabled=false;micLangSel.style.display=hasOai()?'none':(hasSR()?'inline-block':'none');}
+  else if(s==='recording'){micBtn.classList.add('recording');micIcon.innerHTML=SVG_STOP;micLbl.style.display='inline';micLbl.textContent='In ascolto…';micLangSel.style.display='none';micBtn.disabled=false;}
+  else if(s==='processing'){micBtn.classList.add('processing');micIcon.innerHTML=SVG_PROC;micLbl.style.display='inline';micLbl.textContent='Trascrizione…';micLangSel.style.display='none';micBtn.disabled=true;}
+}
+
+async function startWhisper(){
+  try{
+    var stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    audioChunks=[];
+    mediaRecorder=new MediaRecorder(stream);
+    mediaRecorder.ondataavailable=function(e){if(e.data.size>0)audioChunks.push(e.data);};
+    mediaRecorder.onstop=async function(){
+      stream.getTracks().forEach(function(t){t.stop();});
+      setMicState('processing');
+      var oaiKey=document.getElementById('oai-key').value.trim();
+      try{
+        var blob=new Blob(audioChunks,{type:'audio/webm'});
+        var fd=new FormData();fd.append('file',blob,'audio.webm');fd.append('model','whisper-1');
+        var r=await fetch('https://api.openai.com/v1/audio/transcriptions',{method:'POST',headers:{'Authorization':'Bearer '+oaiKey},body:fd});
+        var d=await r.json();
+        if(d.error)throw new Error(d.error.message);
+        if(d.text&&d.text.trim()){document.getElementById('txt').value=d.text.trim();document.getElementById('char-hint').textContent=d.text.trim().length+' car.';}
+      }catch(e){alert('Errore Whisper: '+(e.message||e));}
+      finally{setMicState('idle');}
+    };
+    mediaRecorder.start();isRecording=true;setMicState('recording');
+  }catch(e){alert('Microfono: '+e.message);setMicState('idle');}
+}
+function stopWhisper(){if(mediaRecorder&&isRecording){isRecording=false;mediaRecorder.stop();}}
+
+function startBrowserSR(){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition=new SR();recognition.continuous=false;recognition.interimResults=true;recognition.lang=micLangSel.value;
+  recognition.onstart=function(){isListening=true;setMicState('recording');};
+  recognition.onend=function(){isListening=false;setMicState('idle');};
+  recognition.onerror=function(e){isListening=false;setMicState('idle');if(e.error!=='no-speech'&&e.error!=='aborted')alert('Errore: '+e.error);};
+  recognition.onresult=function(e){var t='';for(var i=e.resultIndex;i<e.results.length;i++)t+=e.results[i][0].transcript;document.getElementById('txt').value=t;document.getElementById('char-hint').textContent=t.length+' car.';};
+  recognition.start();
+}
+function stopBrowserSR(){if(recognition&&isListening){isListening=false;recognition.stop();}}
+
+micBtn.onclick=function(){
+  if(hasOai()){if(isRecording)stopWhisper();else startWhisper();}
+  else if(hasSR()){if(isListening)stopBrowserSR();else startBrowserSR();}
+};
+</script>
+</body>
+</html>
